@@ -1,3 +1,4 @@
+const { request } = require("express");
 const express = require("express");
 const exphbs = require("express-handlebars");
 const mysql = require("mysql2");
@@ -6,7 +7,7 @@ const app = express();
 
 //definindo handlebars como template engine
 
-app.engine("handlenars", exphbs.engine());
+app.engine("handlebars", exphbs.engine());
 app.set("view engine", "handlebars");
 
 app.use(express.static("public"));
@@ -17,8 +18,29 @@ app.use(express.urlencoded({
 
 app.use(express.json());
 
+app.post("/register/save", (request, response) => {
+    const { title, pageqty } = request.body
+    const query = `
+        INSERT INTO books (title, pageqty)
+        VALUES ('${title}', '${pageqty}')
+    `
+
+    conn.query(query, (error) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+
+        response.redirect("/")
+    })
+})
+
+app.get("/register", (request, response) => {
+        response.render("register")
+})
+
 app.get("/", (req, res) => {
-    reposta.render("home")
+    res.render("home")
 })
 
 const conn = mysql.createConnection({
